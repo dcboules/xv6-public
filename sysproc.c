@@ -23,7 +23,10 @@ sys_exit(void)
 int
 sys_wait(void)
 {
-  return wait();
+  int* waitStatus;
+  if (argptr(0, (char**)&waitStatus, sizeof(waitStatus)) <0)
+    return -1;
+  return wait(waitStatus);
 }
 
 int
@@ -88,4 +91,30 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+int sys_hello(void){
+  hello();
+  return 0;
+}
+
+int
+sys_exit1(void)
+{
+  int exitStatus;
+  if (argint(0, &exitStatus) < 0)
+    return -1;
+  exit1(exitStatus);
+  return 0;  // not reached
+}
+
+int
+sys_waitpid(void)
+{
+  int pid;
+  int options = 0;
+  int* waitStatus;
+  if ((argptr(1, (void*)&waitStatus, sizeof(waitStatus)) <0)|| (argint(0, &pid)<0))
+    return -1;
+  return waitpid(pid, waitStatus, options); // int waitpid(int pid, int *status, int options);
 }
